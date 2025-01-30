@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sorteio de Mesas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            color: #333;
+            cursor: pointer;
+        }
+        .sala {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .fileira {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .mesa {
+            border: 1px solid #ccc;
+            padding: 10px;
+            background-color: #fff;
+            border-radius: 5px;
+            width: 150px;
+            text-align: center;
+        }
+        .mesa p {
+            margin: 5px 0;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1 onclick="ativarTruque()">Sorteio de Mesas na Sala de Aula</h1>
+    <button onclick="realizarSorteio()">Sortear Alunos</button>
+
+    <div class="sala" id="sala"></div>
+
+    <script>
+        const alunos = [
+            "Jenifer", "Julia", "Lavínia", "Lorena",
+            "Luiza", "Manuely", "Maria dos Santos",
+            "Maria Touzo", "Mariana", "Miguel",
+            "Nathalya", "Nicole", "Olívia",
+            "Pablo", "Yuri", "Leonardo"
+        ];
+
+        const alunoEspecial = "Leonardo";
+        let truqueAtivo = false;
+
+        function embaralhar(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function realizarSorteio() {
+            let listaAlunos = [...alunos];
+            let alunosEmbaralhados = embaralhar(listaAlunos);
+            if (truqueAtivo) {
+                // Remover o aluno especial e adicionar na Mesa 1 ou 5
+                listaAlunos = listaAlunos.filter(aluno => aluno !== alunoEspecial);
+
+                const posicaoMesaTruque = Math.random() < 0.5 ? 0 : 4; // Mesa 1 (0) ou Mesa 5 (4)
+                listaAlunos.splice(posicaoMesaTruque * 2 + Math.floor(Math.random() * 2), 0, alunoEspecial);
+                alunosEmbaralhados = listaAlunos
+            }
+
+
+            const sala = [
+                ["Mesa 1", "Mesa 2", "Mesa 3", "Mesa 4"],
+                ["Mesa 5", "Mesa 6", "Mesa 7", "Mesa 8"]
+            ];
+
+            let index = 0;
+
+            for (let fileira = 0; fileira < sala.length; fileira++) {
+                for (let mesa = 0; mesa < sala[fileira].length; mesa++) {
+                    let aluno1 = alunosEmbaralhados[index];
+                    let aluno2 = alunosEmbaralhados[index + 1];
+
+                    sala[fileira][mesa] = `${sala[fileira][mesa]}: ${aluno1} e ${aluno2}`;
+                    index += 2;
+                }
+            }
+
+            const salaElement = document.getElementById("sala");
+            salaElement.innerHTML = "";
+
+            sala.forEach((fileira) => {
+                const fileiraElement = document.createElement("div");
+                fileiraElement.className = "fileira";
+
+                fileira.forEach((mesa) => {
+                    const mesaElement = document.createElement("div");
+                    mesaElement.className = "mesa";
+                    mesaElement.innerHTML = `<p><strong>${mesa.split(":")[0]}</strong></p><p>${mesa.split(":")[1]}</p>`;
+                    fileiraElement.appendChild(mesaElement);
+                });
+
+                salaElement.appendChild(fileiraElement);
+            });
+
+            truqueAtivo = false;
+        }
+
+        function ativarTruque() {
+            truqueAtivo = true;
+        }
+
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Control" && !truqueAtivo) {
+                truqueAtivo = true;
+            }
+        });
+    </script>
+</body>
+</html>
